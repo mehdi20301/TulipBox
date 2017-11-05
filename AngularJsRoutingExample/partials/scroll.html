@@ -11,11 +11,26 @@
            /><button ng-click="uploadFile()" ng-if="Ui.active('searchBar')" class="btn btn-primary">Upload File</button>
 
   <div class="scrollable-content" ui-scroll-bottom="bottomReached()">
-    <div class="list-group">
-        <a ng-repeat="item in todos" href="" class="list-group-item">
-            {{ item.text }} <i class="fa fa-chevron-right pull-right"></i>
-        </a>
-    </div>
+    <div class="list-group-item">
+        <table border="1" width="100%">
+            <tr class="list-item">
+                <th ng-click="orderByClick('text')">Name</th>
+                <th ng-click="orderByClick('count')">No Count</th>
+                <th>Action</th>
+            </tr>
+            <tr class="list-item" ng-repeat="item in todos | orderBy :customOrderBy">
+                <td>
+                    {{ item.text }}
+                </td>
+                <td>
+                    {{ item.count }}
+                </td>
+                <td>
+                    <i class="fa fa-chevron-right pull-right"></i>
+                </td>
+            </tr>
+        </table>
+</div>
   </div>
 
   <a class="btn btn-block btn-lg btn-primary scrollable-footer" ui-toggle="searchBar">

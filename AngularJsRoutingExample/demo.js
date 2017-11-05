@@ -449,8 +449,8 @@ app.controller('MainController', function ($rootScope, $scope) {
     //
     $scope.formtodo = {};
     $scope.todos = [
-      { text: 'learn angular', done: true },
-      { text: 'build an angular app', done: false }];
+      { text: 'salam', done: true , count:1 },
+      { text: 'bye', done: false,count:1 }];
 
     $scope.addTodo = function () {
         $scope.todos.push({ text: $scope.formtodo.todoText, done: false });
@@ -529,17 +529,41 @@ app.controller('MainController', function ($rootScope, $scope) {
   $scope.bottomReached = function() {
       alert('Congrats you scrolled to the end of the list!');
   };
-  
+  $scope.orderByClick = function (x) {
+      if ($scope.customOrderBy == x) {
+          $scope.customOrderBy = -x;
+      }else
+      {
+          $scope.customOrderBy = x;
+      }
+      
+  }
   $scope.LoadScrollItems = function (result) {
 
       var items = result.split(' ');
 
-      var newtodo = [];
-      for (var i = 1; i <= items.length; i++) {
-          newtodo.push({ text: items[i], done: false });
-      }
-      angular.forEach(newtodo, function (todo) {
-          if (true) $scope.todos.push(todo);
+      //var newtodo = [];
+      //for (var i = 1; i <= items.length; i++) {
+      //    newtodo.push({ text: items[i], done: false });
+      //}
+      angular.forEach(items, function (item) {
+
+          //var findingItem = $scope.todos.filter(function (filteritem) {
+          //    return filteritem.text === item;
+          //});
+          var find =false;
+          angular.forEach($scope.todos, function (todo) {
+              if(!find)
+                  if (todo.text == item)
+                  {
+                      todo.count += 1;
+                      find = true;
+                  }
+          });
+
+          if (!find) {
+              $scope.todos.push({ text: item, done: false , count:1 });
+          }
       });
       $scope.$apply();
   }
