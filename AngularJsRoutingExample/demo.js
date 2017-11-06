@@ -445,6 +445,8 @@ function displayContents(txt) {
 //});
 app.controller('MainController', function ($rootScope, $scope) {
 
+    var basicWords = ['i','you','they','he','she','the','a'];
+    var originalText = "";
     //
     //
     $scope.formtodo = {};
@@ -522,7 +524,7 @@ app.controller('MainController', function ($rootScope, $scope) {
               $scope.LoadScrollItems(output);
               //displayContents(output);
           };//end onload()
-          reader.readAsText(filePath.files[0]);
+          reader.readAsText(filePath.files[0], 'ISO-8859-1');
           
       }//end if html5 filelist support
   };
@@ -531,7 +533,7 @@ app.controller('MainController', function ($rootScope, $scope) {
   };
   $scope.orderByClick = function (x) {
       if ($scope.customOrderBy == x) {
-          $scope.customOrderBy = -x;
+          $scope.customOrderBy = '-'+x;
       }else
       {
           $scope.customOrderBy = x;
@@ -539,31 +541,47 @@ app.controller('MainController', function ($rootScope, $scope) {
       
   }
   $scope.LoadScrollItems = function (result) {
-
-      var items = result.split(' ');
+      var temp = "";
+      temp = result.replace(/(?:\r?\n)*\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n/g, '~ ');
+      temp = temp.replace(/[`@#$%^&*()_|+\-"<>\{\}\[\]\\\/]/gi, '');
+      //temp = temp.replace(/[.!=?;:,\/]/gi, ' ');
+      angular.forEach(basicWords, function (word) {
+          var reg = new RegExp('(^| )' + word + '( |$)', 'igm');
+          result = result.replace(reg, '');
+      });
+      alert(temp);
+      var items = result.split(/(?:\r?\n)*\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n/);
 
       //var newtodo = [];
       //for (var i = 1; i <= items.length; i++) {
       //    newtodo.push({ text: items[i], done: false });
       //}
+      var phrases = [];
+      var words = [];
+
       angular.forEach(items, function (item) {
 
           //var findingItem = $scope.todos.filter(function (filteritem) {
           //    return filteritem.text === item;
           //});
+          words = item.split(' ');
+          phrases.push({ phrase: item, words: words });
           var find =false;
-          angular.forEach($scope.todos, function (todo) {
-              if(!find)
-                  if (todo.text == item)
+          angular.forEach(words, function (word) {
+              angular.forEach($scope.todos  , function (todo) {
+                  if (todo.text == word)
                   {
                       todo.count += 1;
                       find = true;
+                      return false;
                   }
+              });
+              if (!find) {
+                  $scope.todos.push({ text: word, done: false, count: 1 });
+                  find = false;
+              }
           });
 
-          if (!find) {
-              $scope.todos.push({ text: item, done: false , count:1 });
-          }
       });
       $scope.$apply();
   }
