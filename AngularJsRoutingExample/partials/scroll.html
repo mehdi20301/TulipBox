@@ -3,14 +3,25 @@
 </div>
 
 <div class="scrollable" ui-shared-state="searchBar">
-    <input ng-if="Ui.active('searchBar')"
-           type="file"
-           id="fileUploader"
-           class="form-control scrollable-header"
-           ng-cl="readTextChange(this)"
-           /><button ng-click="uploadFile()" ng-if="Ui.active('searchBar')" class="btn btn-primary">Upload File</button>
 
-  <div class="scrollable-content" ui-scroll-bottom="bottomReached()">
+    
+    <div class="scrollable-header alert alert-info ">
+        Drag right to dismiss notices!
+    </div>
+    <div class="alert">
+        <div class="pull-left">
+            <input type="file"
+                   id="fileUploader"
+                   ng-cl="readTextChange(this)" />
+        </div>
+        <div class="pull-left"><button ng-click="uploadFile()" >Upload File</button></div>
+        <div class="btn pull-left fa fa-sort" ng-click="orderByClick('text')">Order by Name</div>
+        <div class="btn pull-left fa fa-sort" ng-click="orderByClick('count')">Order by Number of use in file</div>
+        <div class="pull-left"><button ng-click="deleteAllItems()">Delete Selected Items</button></div>
+    </div>
+  <!--
+      ng-if="Ui.active('searchBar')"
+      <div class="scrollable-content" ui-scroll-bottom="bottomReached()">
     <div class="list-group-item">
         <table border="1" width="100%">
             <tr class="list-item">
@@ -31,7 +42,26 @@
             </tr>
         </table>
 </div>
-  </div>
+      drag-to-dismiss="deleteNotice(notice)"
+  </div>-->
+
+
+        <div class="scrollable-content">
+            <div class="container-fluid">
+                <div class="notices-container">
+                    <div ng-repeat="item in todos | orderBy :customOrderBy"
+                         drag-to-dismiss="deleteItemTodo(item)"
+                         class="section section-break "
+                         ng-class="{'section-danger':item.done}"
+                         ng-click="selectedItem(item)">
+                        <i class="fa fa-eye-slash"></i> {{item.text }}
+                        <i class="pull-right">({{ item.count }})</i>
+                    </div>
+                </div>
+            </div>
+            <br />
+        </div>
+
 
   <a class="btn btn-block btn-lg btn-primary scrollable-footer" ui-toggle="searchBar">
     <i class="fa fa-search"></i>

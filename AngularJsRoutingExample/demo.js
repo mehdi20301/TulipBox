@@ -88,6 +88,21 @@ app.config(function ($stateProvider, $urlRouterProvider) {
             templateUrl: "partials/scroll.html",
             authenticate: false
         })
+        .state("swipe", {
+            url: "/swipe",
+            templateUrl: "partials/swipe.html",
+            authenticate: false
+        })
+        .state("accordion", {
+            url: "/accordion",
+            templateUrl: "partials/accordion.html",
+            authenticate: false
+        })
+        .state("drag", {
+            url: "/drag",
+            templateUrl: "partials/drag.html",
+            authenticate: false
+        })
         .state("forms", {
             url: "/forms",
             templateUrl: "partials/forms.html",
@@ -540,6 +555,28 @@ app.controller('MainController', function ($rootScope, $scope) {
       }
       
   }
+  $scope.selectedItem = function (item) {
+      item.done = !item.done;
+  };
+
+  $scope.deleteAllItems = function () {
+      var unselectedItems = [];
+      angular.forEach($scope.todos, function (todo) {
+          if (todo.done) {
+              basicWords.push(todo.text);
+          } else {
+              unselectedItems.push(todo);
+          }
+      });
+      $scope.todos = unselectedItems;
+      //$scope.$apply();
+  };
+  $scope.deleteItemTodo = function (item) {
+      var index = $scope.todos.indexOf(item);
+      if (index > -1) {
+          $scope.todos.splice(index, 1);
+      }
+  };
   $scope.LoadScrollItems = function (result) {
       var temp = "";
       temp = result.replace(/(?:\r?\n)*\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n/g, '~ ');
@@ -577,7 +614,7 @@ app.controller('MainController', function ($rootScope, $scope) {
                   }
               });
               if (!find) {
-                  $scope.todos.push({ text: word, done: false, count: 1 });
+                  $scope.todos.push({ text: word, done: false, count: 1  });
                   find = false;
               }
           });
