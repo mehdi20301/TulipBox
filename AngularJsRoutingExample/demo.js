@@ -1,4 +1,4 @@
-/* eslint no-alert: 0 */
+﻿/* eslint no-alert: 0 */
 
 'use strict';
 
@@ -32,7 +32,7 @@ app.run(function ($transform, $rootScope, $state, AuthService) {
         //!AuthService.IsAuthenticated()
         if (toState.authenticate ) {
             alert("Not Authenticated");
-            // User isn�t authenticated
+            // User isn’t authenticated
             $state.transitionTo("login");
             event.preventDefault();
         }
@@ -462,6 +462,7 @@ app.controller('MainController', function ($rootScope, $scope) {
 
     var basicWords = ['i','you','they','he','she','the','a'];
     var originalText = "";
+    var filePath = "";
     //
     //
     $scope.formtodo = {};
@@ -530,18 +531,24 @@ app.controller('MainController', function ($rootScope, $scope) {
 
   $scope.uploadFile = function () {
       var reader = new FileReader();
-      var filePath = document.getElementById('fileUploader');
-      var output = ""; //placeholder for text output
+      filePath = document.getElementById('fileUploader');
+
       if (filePath.files && filePath.files[0]) {
           reader.onload = function (e) {
-              output = e.target.result;
-              
-              $scope.LoadScrollItems(output);
+              originalText = e.target.result;
+              $scope.LoadScrollItems(originalText);
               //displayContents(output);
           };//end onload()
           reader.readAsText(filePath.files[0], 'ISO-8859-1');
           
       }//end if html5 filelist support
+  };
+  $scope.downloadFile = function () {
+      var filename = filePath.value.split('\\');
+      var reg = new RegExp('(^|,|-|.|!|=|+|?|;| )' + 'mom' + '(|,|-|.|!|=|+|?|;| |$)', 'igm');
+      //originalText = originalText.replace(/[.!=+?;\/]/gi, function (value, index) { return ' ' + value + ' '; });
+      originalText = originalText.replace(reg, function (value, index) { return value + '-مامان-'; }); //, 'Mommy-مامان-');
+      download(originalText, filename[filename.length-1]);
   };
   $scope.bottomReached = function() {
       alert('Congrats you scrolled to the end of the list!');
@@ -579,16 +586,16 @@ app.controller('MainController', function ($rootScope, $scope) {
   };
   $scope.LoadScrollItems = function (result) {
       var temp = "";
-      temp = result.replace(/(?:\r?\n)*\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n/g, '~ ');
+      temp = result.replace(/(?:\r?\n)*\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n/g, ' ~ ');
       temp = temp.replace(/[`@#$%^&*()_|+\-"<>\{\}\[\]\\\/]/gi, '');
-      //temp = temp.replace(/[.!=?;:,\/]/gi, ' ');
+      temp = temp.replace(/[.!=?;:,\/]{1}/gi, ' ');
       angular.forEach(basicWords, function (word) {
           var reg = new RegExp('(^| )' + word + '( |$)', 'igm');
-          result = result.replace(reg, '');
+          temp = temp.replace(reg, '');
       });
-      alert(temp);
-      var items = result.split(/(?:\r?\n)*\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n/);
 
+      //var items = result.split(/(?:\r?\n)*\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n/);
+      var items = temp.split('~');
       //var newtodo = [];
       //for (var i = 1; i <= items.length; i++) {
       //    newtodo.push({ text: items[i], done: false });
@@ -605,17 +612,19 @@ app.controller('MainController', function ($rootScope, $scope) {
           phrases.push({ phrase: item, words: words });
           var find =false;
           angular.forEach(words, function (word) {
-              angular.forEach($scope.todos  , function (todo) {
-                  if (todo.text == word)
-                  {
-                      todo.count += 1;
-                      find = true;
-                      return false;
+              word = word.trim();
+              if (word != '') {
+                  angular.forEach($scope.todos, function (todo) {
+                      if (todo.text == word) {
+                          todo.count += 1;
+                          find = true;
+                          return false;
+                      }
+                  });
+                  if (!find) {
+                      $scope.todos.push({ text: word, done: false, count: 1 });
+                      find = false;
                   }
-              });
-              if (!find) {
-                  $scope.todos.push({ text: word, done: false, count: 1  });
-                  find = false;
               }
           });
 
@@ -686,3 +695,13 @@ app.controller('MainController', function ($rootScope, $scope) {
     }
   };
 });
+
+
+function download(content, filename, contentType) {
+    if (!contentType) contentType = 'application/octet-stream;charset=utf-8';
+    var a = document.createElement('a');
+    var blob = new Blob([content], { 'type': contentType });
+    a.href = window.URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+}
