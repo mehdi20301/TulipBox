@@ -20,6 +20,7 @@
         <div class="pull-left"><button ng-click="deleteAllItems()">Delete Selected Items</button></div>
 
         <div class="pull-left"><button ng-click="downloadFile()">Download</button></div>
+        <div class="pull-left"><button ng-click="translate()">Translate</button></div>
     </div>
   <!--
       ng-if="Ui.active('searchBar')"
@@ -47,22 +48,25 @@
       drag-to-dismiss="deleteNotice(notice)"
   </div>-->
 
-
-        <div class="scrollable-content">
-            <div class="container-fluid">
-                <div class="notices-container">
-                    <div ng-repeat="item in todos | orderBy :customOrderBy"
-                         drag-to-dismiss="deleteItemTodo(item)"
-                         class="section section-break "
-                         ng-class="{'section-danger':item.done}"
-                         ng-click="selectedItem(item)">
-                        <i class="fa fa-eye-slash"></i> {{item.text }}
-                        <i class="pull-right">({{ item.count }})</i>
-                    </div>
+    
+    <div class="scrollable-content">
+        <div class="container-fluid">
+            <div class="notices-container">
+                <div class="progress ng-isolate-scope">
+                    <div class="progress-bar" ng-style="progressStyle"></div>
+                </div>
+                <div ng-repeat="item in todos | orderBy :customOrderBy"
+                     drag-to-dismiss="deleteItemTodo(item)"
+                     class="section section-break "
+                     ng-class="{'section-danger':item.done}"
+                     ng-click="selectedItem(item)">
+                    <i class="fa fa-eye-slash"></i> {{item.text }}
+                    <i class="pull-right">({{ item.count }})</i>
                 </div>
             </div>
-            <br />
         </div>
+        <br />
+    </div>
 
 
   <a class="btn btn-block btn-lg btn-primary scrollable-footer" ui-toggle="searchBar">

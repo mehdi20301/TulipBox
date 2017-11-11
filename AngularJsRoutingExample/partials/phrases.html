@@ -1,0 +1,26 @@
+﻿<div ui-content-for="title">
+    <span>Phrases</span>
+</div>
+<div class="scrollable">
+    <div class="scrollable-content">
+        <div class="section">
+            <div class="panel-group"
+                 ui-shared-state="myAccordion"
+                 ui-default='2'>
+                <div class="panel panel-default" ng-repeat="(i,phrase) in basicPhrases">
+                    <div class="panel-heading" ui-set="{'myAccordion': i}">
+
+                        <h4 class="panel-title">
+                            <i class="fa fa-lock"></i> {{phrase.text}}
+                        </h4>
+                    </div>
+                    <div ui-if="myAccordion == {{i}}">
+                        <div class="panel-body">
+                            {{phrase.result}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

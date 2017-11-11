@@ -24,19 +24,29 @@ var app = angular.module('TulipCloudsApp', [
 //    //    alert('y');
 //    //});
 //});
-app.run(function ($transform, $rootScope, $state, AuthService) {
+app.run(function ($transform, $rootScope, $state,$http, AuthService) {
     window.$transform = $transform;
     $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
         //debugger;
         //var cookieWObject = read_cookie('cookieName');
         //!AuthService.IsAuthenticated()
-        if (toState.authenticate ) {
+        if (toState.authenticate && !AuthService.IsAuthenticated()) {
             alert("Not Authenticated");
             // User isn’t authenticated
             $state.transitionTo("login");
             event.preventDefault();
+        } else {
+            $http({
+                method: 'Get',
+                dataType: 'json',
+                headers: {
+                    Authorization: "Bearer " + AuthService._isAccessToken
+                },
+                url: 'http://localhost:60099/api/User/12',
+            }).then(function (data, statusText, xhdr) {
+                console.log(JSON.stringify(data));
+            });
         }
-
     });
 });
 //
@@ -88,6 +98,21 @@ app.config(function ($stateProvider, $urlRouterProvider) {
             templateUrl: "partials/scroll.html",
             authenticate: false
         })
+        .state("knowing", {
+            url: "/knowing",
+            templateUrl: "partials/knowing.html",
+            authenticate: false
+        })
+        .state("basicWords", {
+            url: "/basicWords",
+            templateUrl: "partials/basicWords.html",
+            authenticate: false
+        })
+        .state("phrases", {
+            url: "/phrases",
+            templateUrl: "partials/phrases.html",
+            authenticate: false
+        })
         .state("swipe", {
             url: "/swipe",
             templateUrl: "partials/swipe.html",
@@ -121,6 +146,7 @@ app.config(function ($stateProvider, $urlRouterProvider) {
             authenticate: false
         })
     ;
+    
     //If know route matches it will works........
     $urlRouterProvider.otherwise("/login"); 
 });
@@ -335,9 +361,9 @@ app.directive('dragMe', ['$drag', function($drag) {
 //
 // For this trivial demo we have just a unique MainController
 // for everything
-//
+//,Storage
 
-app.controller("myLoggingCtrl", function ($scope, $http, $state, AuthService,Storage) {
+app.controller("myLoggingCtrl", function ($scope, $http, $state, AuthService) {
     $scope.myFunc = function (Users) {
         console.log(Users);
         //var promisePost = crudService.post(Users);
@@ -349,11 +375,11 @@ app.controller("myLoggingCtrl", function ($scope, $http, $state, AuthService,Sto
             },
             url: 'http://localhost:60099/api/jwt',
             data: JSON.stringify(Users),
-        }).then(function (data) {
+        }).then(function (response) {
             AuthService._isAuthenticated = true;
-            AuthService._isAccessToken = data.access_token;
+            AuthService._isAccessToken = response.data.access_token;
             console.log(AuthService);
-            bake_cookie('cookieName', data);
+            //bake_cookie('cookieName', data);
             $state.go("home");
         });
         console.log(promisePost);
@@ -369,8 +395,8 @@ app.service('AuthService', function () {
 });
 function TodoCtrl($scope) {
     $scope.todos = [
-      { text: 'learn angular', done: true },
-      { text: 'build an angular app', done: false }];
+      { text: 'learn angular', done: true ,result:''},
+      { text: 'build an angular app', done: false ,result:''}];
 
     $scope.addTodo = function () {
         $scope.todos.push({ text: $scope.todoText, done: false });
@@ -458,17 +484,27 @@ function displayContents(txt) {
 //    }
 //    return storage;
 //});
-app.controller('MainController', function ($rootScope, $scope) {
-
-    var basicWords = ['i','you','they','he','she','the','a'];
+app.controller('MainController', function ($rootScope, $scope, $http ) {
     var originalText = "";
+    
     var filePath = "";
+    var translateUrl = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=fa&dt=t&q=";
+
+    $scope.basicWords = ['i', 'you', 'they', 'he', 'she', 'the', 'a'];
+    $scope.knowing = ['mist'];
+    $scope.basicPhrases = [{ text: 'we go', result: 'ما میریم' }, { text: 'bon appetit', result:'بفرمایید' }];
     //
     //
+    $scope.indexOfTodo = 1;
+    $scope.progressStyle = {width: '0%'};
+    //$scope.contained_progressbar = ngProgressFactory.createInstance();
+    //$scope.contained_progressbar.setParent(document.getElementById('progress_contained'));
+    //$scope.contained_progressbar.setAbsolute();
+
     $scope.formtodo = {};
     $scope.todos = [
-      { text: 'salam', done: true , count:1 },
-      { text: 'bye', done: false,count:1 }];
+      { text: 'salam', done: true , count:1,result:'' },
+      { text: 'bye', done: false,count:1,result:'' }];
 
     $scope.addTodo = function () {
         $scope.todos.push({ text: $scope.formtodo.todoText, done: false });
@@ -545,10 +581,42 @@ app.controller('MainController', function ($rootScope, $scope) {
   };
   $scope.downloadFile = function () {
       var filename = filePath.value.split('\\');
-      var reg = new RegExp('(^|,|-|.|!|=|+|?|;| )' + 'mom' + '(|,|-|.|!|=|+|?|;| |$)', 'igm');
+      var regWord = new RegExp('(^|,|-|\\.|!|=|\\+|\\?|;| )' + 'mom' + '(,|-|\\.|!|=|\\+|\\?|;| |$)', 'igm');
+      var regPhrase = new RegExp('(^|,|-|\\.|!|=|\\+|\\?|;| )' + 'we go' + '(,|-|\\.|!|=|\\+|\\?|;| |$)', 'igm');
       //originalText = originalText.replace(/[.!=+?;\/]/gi, function (value, index) { return ' ' + value + ' '; });
-      originalText = originalText.replace(reg, function (value, index) { return value + '-مامان-'; }); //, 'Mommy-مامان-');
+      originalText = originalText.replace(regPhrase, function (value, index) { var res = value.replace(' ', '~'); return  ' '+res + '-ما رفتیم- '; });
+      originalText = originalText.replace(regWord, function (value, index) { return value + '-مامان- '; }); //, 'Mommy-مامان-');
+      originalText = originalText.replace(/(^)~|~($)|(^) | ($)/gim, '');
+      originalText = originalText.replace(/~|( )~|~( )/gim, ' ');
       download(originalText, filename[filename.length-1]);
+  };
+  $scope.translate = function () {
+      var length = $scope.todos.length;
+      if ($scope.indexOfTodo <= length) {
+              setTimeout(function () {
+                  $scope.progressStyle.width = Math.round($scope.indexOfTodo  / length * 100) + '%';
+                  $scope.indexOfTodo+=1;
+                  $scope.$apply();
+                  $scope.translate();
+              }, 100);
+          }
+
+      //angular.forEach($scope.todos, function (todo,$index) {
+      //    //$http({
+      //    //    method: 'Get',
+      //    //    dataType: 'json',
+      //    //    url: translateUrl + todo.text,
+      //    //}).then(function (data, statusText, xhdr) {
+      //    //    alert(data);
+      //    //});
+      //    alert(Math.round(($index + 1) / length * 100));
+      //    todo.result = 'TO-DO';
+          
+      //    //$scope.$apply();
+      //    //$scope.contained_progressbar.set(Math.round(index / length * 100));
+          
+      //});
+
   };
   $scope.bottomReached = function() {
       alert('Congrats you scrolled to the end of the list!');
@@ -570,7 +638,7 @@ app.controller('MainController', function ($rootScope, $scope) {
       var unselectedItems = [];
       angular.forEach($scope.todos, function (todo) {
           if (todo.done) {
-              basicWords.push(todo.text);
+              $scope.basicWords.push(todo.text);
           } else {
               unselectedItems.push(todo);
           }
@@ -589,13 +657,13 @@ app.controller('MainController', function ($rootScope, $scope) {
       temp = result.replace(/(?:\r?\n)*\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n/g, ' ~ ');
       temp = temp.replace(/[`@#$%^&*()_|+\-"<>\{\}\[\]\\\/]/gi, '');
       temp = temp.replace(/[.!=?;:,\/]{1}/gi, ' ');
-      angular.forEach(basicWords, function (word) {
+      angular.forEach($scope.basicWords, function (word) {
           var reg = new RegExp('(^| )' + word + '( |$)', 'igm');
           temp = temp.replace(reg, '');
       });
 
       //var items = result.split(/(?:\r?\n)*\d+\r?\n\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}\r?\n/);
-      var items = temp.split('~');
+      var items = temp.toLowerCase().split('~');
       //var newtodo = [];
       //for (var i = 1; i <= items.length; i++) {
       //    newtodo.push({ text: items[i], done: false });
@@ -622,7 +690,7 @@ app.controller('MainController', function ($rootScope, $scope) {
                       }
                   });
                   if (!find) {
-                      $scope.todos.push({ text: word, done: false, count: 1 });
+                      $scope.todos.push({ text: word, done: false, count: 1,result:'' });
                       find = false;
                   }
               }

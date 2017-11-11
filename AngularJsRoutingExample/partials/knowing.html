@@ -1,0 +1,38 @@
+﻿<div ui-content-for="title">
+    <span>Knowing</span>
+</div>
+
+<div class="scrollable" ui-shared-state="searchBar">
+
+
+    <div class="scrollable-header alert alert-info ">
+        Drag right to dismiss notices!
+    </div>
+    <div class="alert">
+        <div class="btn pull-left fa fa-sort" ng-click="orderByClick('text')">Order by Name</div>
+        <div class="pull-left"><button ng-click="deleteAllItems()">Delete Selected Items</button></div>
+
+    </div>
+
+    <div class="scrollable-content">
+        <div class="container-fluid">
+            <div class="notices-container">
+                <div ng-repeat="item in knowing"
+                     drag-to-dismiss="deleteItemTodo(item)"
+                     class="section section-break "
+                     ng-click="selectedItem(item)">
+                    <i class="fa fa-eye"></i> {{item}}
+                </div>
+            </div>
+        </div>
+        <br />
+    </div>
+
+
+    <a class="btn btn-block btn-lg btn-primary scrollable-footer" ui-toggle="searchBar">
+        <i class="fa fa-search"></i>
+        <span ui-hide="searchBar">Show</span>
+        <span ui-show="searchBar">Hide</span>
+        Search Bar
+    </a>
+</div>
