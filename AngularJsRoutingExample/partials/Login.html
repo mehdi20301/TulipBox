@@ -1,9 +1,39 @@
-﻿<div class="jumbotron text-center">
+﻿<!--<div class="jumbotron text-center">
     <h1>JWT Login</h1>
-     <h4>hint-u:test -p:test</h4>
+    <h4>hint-u:test -p:test</h4>
     <div ng-controller="myLoggingCtrl">
         <p>Enter User Name: <input type="text" ng-model="Users.UserName"></p>
         <p>Enter Password Name: <input type="text" ng-model="Users.Password"></p>
-        <input type="button" name="send" value="Send Data" ng-click="myFunc(Users)" />
+        <input type="button" name="send" value="Send Data" />
     </div>
-</div>
+</div>-->
+
+
+<form ng-controller="myLoggingCtrl" class="form-horizontal">
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="textinput">User Name</label>
+            <div class="col-md-5">
+                <input ng-model="Users.UserName" type="text" placeholder="Username" class="form-control input-md">
+                <span class="help-block hide"></span>
+            </div>
+        </div>
+
+        <!-- Search input-->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="searchinput">Password</label>
+            <div class="col-md-5">
+                <input ng-model="Users.Password" type="password" placeholder="Password" class="form-control input-md">
+                <p class="help-block hide"></p>
+            </div>
+        </div>
+
+        <!-- Button -->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="searchinput"></label>
+
+            <div class="col-md-5 float-right">
+                <button id="singlebutton" name="singlebutton" class="btn btn-primary input-md" ng-click="myFunc(Users)">Login</button>
+            </div>
+        </div>
+</form>

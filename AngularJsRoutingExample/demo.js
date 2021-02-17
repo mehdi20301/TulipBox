@@ -26,6 +26,7 @@ var app = angular.module('TulipCloudsApp', [
 //});
 app.run(function ($transform, $rootScope, $state,$http, AuthService) {
     window.$transform = $transform;
+   
     $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
         //debugger;
         //var cookieWObject = read_cookie('cookieName');

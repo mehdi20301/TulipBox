@@ -1706,7 +1706,7 @@
          *
          * @param {object} object An object of the form `{state1: value1, ..., stateN: valueN}`
          */
-        setMany: function(map) {
+          setMany: function (map) {
           angular.forEach(map, function(value, id) {
             this.setOne(id, value);
           }, this);

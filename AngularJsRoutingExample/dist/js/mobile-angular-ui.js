@@ -1707,7 +1707,7 @@
          * @param {object} object An object of the form `{state1: value1, ..., stateN: valueN}`
          */
         setMany: function(map) {
-          angular.forEach(map, function(value, id) {
+            angular.forEach(map, function (value, id) {
             this.setOne(id, value);
           }, this);
         },
@@ -3489,7 +3489,8 @@
       ) {
         return {
           restrict: 'C',
-          link: function(scope, elem, attrs) {
+            link: function (scope, elem, attrs) {
+                debugger;
             var parentClass = 'has-sidebar-' + side;
             var visibleClass = 'sidebar-' + side + '-visible';
             var activeClass = 'sidebar-' + side + '-in';
@@ -3513,15 +3514,14 @@
               $rootElement
                 .removeClass(activeClass);
             });
-
             var defaultActive = attrs.active !== undefined && attrs.active !== 'false';
             SharedState.initialize(scope, stateName, {defaultValue: defaultActive});
-
+                
             scope.$on('mobile-angular-ui.state.changed.' + stateName, function(e, active) {
               if (trackAsSearchParam) {
                 $location.search(stateName, active || null);
               }
-
+                
               if (active) {
                 $rootElement
                   .addClass(visibleClass);
