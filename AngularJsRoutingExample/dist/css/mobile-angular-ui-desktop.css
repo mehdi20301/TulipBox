@@ -418,6 +418,9 @@
     }
 }
 
+.sidebar {
+    direction:rtl;
+}
 .breadcrumb {
     padding: 8px 15px;
     margin-bottom: 20px;
@@ -605,7 +608,6 @@
 @media (min-width: 992px) {
     .sidebar {
         pointer-events: auto;
-        direction: rtl;
     }
 
     .sidebar-toggle {
